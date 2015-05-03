@@ -54,23 +54,14 @@ Origin Data Source Properties
 
 The following properties are common to all origin data sources.
 
-username
-   The user principal to identify as when connecting
-
-password
-   The user credential to authenticate with when connecting
-
-blackout
-   The number of seconds to blackout a server once a connection failure occurs.
-   This defaults to 30 seconds.
-
-connect-timeout
-   The number of seconds to wait for a connection to complete. This defaults to
-   zero which implies wait indefinitely.
-
-read-timeout
-   The number of seconds to wait for a query to execute. This defaults to zero
-   which implies wait indefinitely.
+* username - The user principal to identify as when connecting
+* password - The user credential to authenticate with when connecting
+* blackout - The number of seconds to blackout a server once a connection failure occurs.
+               This defaults to 30 seconds.
+* connect-timeout -  The number of seconds to wait for a connection to complete. This
+                        defaults to zero which implies wait indefinitely.
+* read-timeout -  The number of seconds to wait for a query to execute. This defaults to
+                     zero which implies wait indefinitely.
 
 
 
@@ -80,8 +71,7 @@ AS400 Origin Data Source Properties
 The following properties extend those defined in Origin Data Source and are specific to an AS400
 connection.
 
-hostname
-   The hostname to connect to.
+* hostname - The hostname to connect to.
 
 
 
@@ -91,27 +81,17 @@ JDBC Origin Data Source Properties
 The following properties extend those defined in Origin Data Source and are specific to a JDBC
 connection.
 
-url
-   The driver specific database url to connect to
-
-driver
-   The JDBC driver to use
-
-isolation
-   JDBC data sources allow a default transaction isolation level to be specified. Must be
-   one of (Uncommitted | Committed | Repeatable | Serializable) and defaults to Serializable
-
-read-only
-   JDBC data sources allow a default read-only state to be specified. This is a boolean and
-   defaults to false.
-
-holdability
-   JDBC data sources allow a default result set holdability to be specified. Must be one of
-   (Close | Hold) and it defaults to Hold
-
-auto-commit
-   JDBC data sources allow a default auto-commit state to be specified. This is a boolean and
-   defaults to true.
+* url -The driver specific database url to connect to
+* driver -The JDBC driver to use
+* isolation - JDBC data sources allow a default transaction isolation level to be specified. Must
+               be one of (Uncommitted | Committed | Repeatable | Serializable) and defaults to
+               Serializable
+* read-only - JDBC data sources allow a default read-only state to be specified. This is a boolean
+               and defaults to false.
+* holdability -  JDBC data sources allow a default result set holdability to be specified. Must be
+                  one of (Close | Hold) and it defaults to Hold
+* auto-commit - JDBC data sources allow a default auto-commit state to be specified. This is a
+                  boolean and defaults to true.
 
 
 
