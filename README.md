@@ -100,43 +100,28 @@ Pooling Data Source Properties
 
 The following properties apply to all pooling data sources.
 
-min-connections
-   The minimum number of connections to maintain in the pool. As connections are closed due to
-   the other defined properties the pool will attempt to maintain at least this number of
-   connections. This defaults to zero.
-
-max-connections
-   The maximum number of connections this pool will allow before blocking callers. This defaults
-   to zero which implies no limit.
-
-max-idle-time
-   The maximum number of seconds a connection may remain idle in the pool before it is removed in
-   one of the duty cycles. This defaults to zero which implies no maximum idle time.
-
-max-idle
-   The maximum number of idle connections in the pool before additional connections being returned
-   are closed rather than repooled. This value must be greater than or equal to min-connections and
-   less than max-connections or it will be ignored. This defaults to zero which implies no limit to
+* min-connections - The minimum number of connections to maintain in the pool. As connections are
+   closed due to the other defined properties the pool will attempt to maintain at least this number
+   of connections. This defaults to zero.
+* max-connections - The maximum number of connections this pool will allow before blocking callers.
+   This defaults to zero which implies no limit.
+* max-idle-time - The maximum number of seconds a connection may remain idle in the pool before it is
+   removed in one of the duty cycles. This defaults to zero which implies no maximum idle time.
+* max-idle -  The maximum number of idle connections in the pool before additional connections being
+   returned are closed rather than repooled. This value must be greater than or equal to min-connections
+   and less than max-connections or it will be ignored. This defaults to zero which implies no limit to
    the number of idle connections the pool will hold.
-
-max-life-time
-   The maximum number of seconds a connection may be alive before being closed. This time is
-   measured from the moment the connection is created. Connections that have been alive, idle or not,
+* max-life-time -  The maximum number of seconds a connection may be alive before being closed. This time
+   is measured from the moment the connection is created. Connections that have been alive, idle or not,
    for longer than the defined period will be closed when they are returned to the pool or when they
    are encountered during the duty cycle. This defaults to zero which means no maximum life time.
-
-max-wait-time
-   Maximum amount of time in milliseconds to wait for an available connection if max-connections
-   has been reached and all connections are currently busy servicing other requests. This defaults
-   to zero which means wait indefinitely.
-
-test-scheme
-   A pooling data source may support a testing scheme to identify and remove bad or stale connections.
-   It supports the values (Never, Borrow, Return, Idle, Always) and defaults to Never.
-
-duty-cycle
-   Most pooling data sources perform background operations on the pool that occur every X number of
-   seconds. This defaults to 60 seconds. The minimum duty cycle is 5 seconds. Setting this value very
+* max-wait-time -  Maximum amount of time in milliseconds to wait for an available connection if
+   max-connections has been reached and all connections are currently busy servicing other requests. This
+   defaults to zero which means wait indefinitely.
+* test-scheme -  A pooling data source may support a testing scheme to identify and remove bad or stale
+   connections. It supports the values (Never, Borrow, Return, Idle, Always) and defaults to Never.
+* duty-cycle -  Most pooling data sources perform background operations on the pool that occur every X number
+   of seconds. This defaults to 60 seconds. The minimum duty cycle is 5 seconds. Setting this value very
    large effectively ensures it never runs. However, doing so renders the max-idle-time moot.
 
 
