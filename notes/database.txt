@@ -1,0 +1,66 @@
+Apparently both MySQL and DB2 will return a MetaData object even after they have 
+lost their connection.
+         
+DB2 will report isClosed = true after it has lost its connection while MySQL & 
+Derby will not until a query fails.
+         
+Looks like select 1 should work on nearly any database except derby but we are 
+actually going to have to prepare a statement to execute it. There does not appear 
+to be anything directly on the connection we can use to validate it until java 1.6
+         
+Simply preparing the statement will test the connection on some DBs such as derby 
+and db2. No need to actually execute the query. But it is insufficient for MySQL 
+which requires you to actually execute the query.
+         
+         
+Maybe reimpl the JDBC testResource impl to delegate to database specific impls and 
+eliminate the need for a query string. In the case of 1.6 we could pull a test impl 
+that uses the isValid call.
+
+OLD testResource impl
+
+   protected boolean testResource(Connection resource)
+   {
+      try {
+         return resource.isValid(1);
+         String query = getProperty(TEST_QUERY);
+         // Apparently both MySQL and DB2 will return a MetaData object even
+         // after they have lost their connection.
+         
+         // DB2 will report isClosed = true after it has lost its connection
+         // while MySQL & Derby will not until a query fails.
+         
+         // Looks like select 1 should work on nearly any database except derby
+         // but we are actually going to have to prepare a statement to execute 
+         // it. There does not appear to be anything directly on the connection
+         // we can use to validate it until java 1.6
+         
+         // Simply preparing the statement will test the connection on some DBs
+         // such as derby and db2. No need to actually execute the query. But
+         // it is insufficient for MySQL which requires you to actually execute
+         // the query.
+         
+         // TODO My main concern here is that this process blocks for a long
+         // period of time under certain circumstances. I want to limit the
+         // amount of time very similar to JDK1.6's isValid(long timeout)
+         
+         // There should be no issues with concurrency and long blocking periods
+         
+         // I am seriously considering forcing a Java 1.6 upgrade so that we can
+         // take advantage of the isValid method on a connection.
+         
+         // Maybe reimpl this to delegate to database specific impls and eliminate 
+         // the need for a query string. In the case of 1.6 we could pull a test
+         // impl that uses the isValid call.
+         if(!StringUtils.isEmpty(query)) {
+            PreparedStatement pstmt = resource.prepareStatement(query);
+            try {
+               pstmt.execute();
+            } finally {
+               pstmt.close();
+            }
+         }
+         return true;
+      } catch(Exception ex) { }
+      return false;
+   }

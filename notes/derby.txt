@@ -1,0 +1,13 @@
+// variables
+private static String dbURL = "jdbc:derby://localhost:1527/myDB;create=true;user=me;password=mine";
+
+// from the createConnection method
+Class.forName("org.apache.derby.jdbc.ClientDriver").newInstance();
+
+The new values are shown below to use the Embedded Driver.
+
+// variables
+private static String dbURL = "jdbc:derby:myDB;create=true;user=me;password=mine";
+
+// from the createConnection method
+Class.forName("org.apache.derby.jdbc.EmbeddedDriver");

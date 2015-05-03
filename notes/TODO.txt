@@ -1,0 +1,47 @@
+Convert most of the AS400 pool tests to mocked connections
+
+
+Solve concurrency issue in JdbcPoolingDataSource.markUnavailable()
+
+
+Need test and driver support for sybase and informix
+Need driver support for MS-SQL server drivers
+
+
+I have modified BasePoolingDataSource to propigate get/set/clear properties to the origin
+data source where appropriate. I now need to add tests to as400 tests to ensure it works
+as desired.
+
+Provide a means to specify what the test timeout period should be. Connection.isValid()
+supports a number of seconds it should timeout at. At present I have it hard coded to
+2 seconds. It would be nice to allow the user to specify. The down side of course is
+that has no meaning on the AS400 object as it doesn't support a timeout.
+
+Replace COUNT with LongAdder impl. Needs to be back ported from JDK 8 to JDK 6 for
+this library.
+
+
+
+
+
+
+
+
+
+
+
+Whenever a connection is requested from the pool I want to capture a stack trace of the
+calling thread and store it with the connection. At any time via JMX I should be able to
+list all connections the pool has opened and are not yet closed. From that list I should
+be able to tell what connections are busy and which are idle. Of the busy threads I
+should be capable of determining how long they have been active and I should be able to
+obtain the most recent stack trace.
+
+
+
+Replace all calls to TimeProvider.get() with injected providers. I have changed my mind about
+how I want to do this. Ultimately, the supplying of those TimeProviders needs to be transparent
+from the main usage pattern. One option is to make SystemTimeProvider impl the stub method etc
+and then when you call millisTime it look up the stub and returns its value if present otherwise
+it uses the System.currentTimeMillis(). With that model the TimeProvider class becomes an
+interface.
