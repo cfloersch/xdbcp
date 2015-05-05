@@ -57,7 +57,8 @@ The following properties are common to all origin data sources.
 * username - The user principal to identify as when connecting
 * password - The user credential to authenticate with when connecting
 * blackout - The number of seconds to blackout a server once a connection failure occurs.
-               This defaults to 30 seconds.
+              This prevents connection attempts from being made in the specified period
+              allowing the server some slack to be restored. This defaults to 30 seconds.
 * connect-timeout -  The number of seconds to wait for a connection to complete. This
                         defaults to zero which implies wait indefinitely.
 * read-timeout -  The number of seconds to wait for a query to execute. This defaults to
