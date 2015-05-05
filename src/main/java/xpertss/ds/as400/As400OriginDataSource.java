@@ -117,7 +117,12 @@ public class As400OriginDataSource extends BaseDataSource<AS400>
       }
       return results;
    }
- 
+
+   As400OriginDataSource pooled()
+   {
+      pooled = true;
+      return this;
+   }
    
    private AS400 create(String username, String password)
       throws DataSourceException

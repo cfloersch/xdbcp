@@ -38,9 +38,8 @@ public class As400PoolingDataSource extends BasePoolingDataSource<AS400>
 
    As400PoolingDataSource(As400OriginDataSource origin)
    {
-      super(origin);
-      this.origin = Objects.notNull(origin, "origin data source may not be null");
-      this.origin.pooled = true;
+      super(Objects.notNull(origin, "origin data source may not be null"));
+      this.origin = origin.pooled();
    }
    
    
