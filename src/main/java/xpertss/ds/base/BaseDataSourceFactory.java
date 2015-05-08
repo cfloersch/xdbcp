@@ -30,14 +30,12 @@ public class BaseDataSourceFactory {
    {
       Object prefix = env.get(ObjectName.class.getName());
       if(prefix == null) prefix = getContent(ref, "jmx-prefix");
-      if(prefix == null) prefix = System.getProperty(ObjectName.class.getName());
-      if(prefix != null) {
-         try {
-            ObjectName objName = new ObjectName(prefix.toString() + 
-                        ",dstype=" + type.toString() + ",name=" + name.get(0));
-            ManagementFactory.getPlatformMBeanServer().registerMBean(o, objName);
-         } catch(Exception e) { /* Ignored */ }
-      }
+      if(prefix == null) prefix = "Xdbcp:type=Pools";
+      try {
+         ObjectName objName = new ObjectName(prefix.toString() +
+                     ",dstype=" + type.toString() + ",name=" + name.get(0));
+         ManagementFactory.getPlatformMBeanServer().registerMBean(o, objName);
+      } catch(Exception e) { /* Ignored */ }
    }
 
    protected String getContent(Reference ref, String key)
