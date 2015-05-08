@@ -32,13 +32,6 @@ import static junit.framework.Assert.fail;
 import static org.junit.Assert.assertNotNull;
 
 
-/*
-Failed tests:
-  testMaxIdleTimeAndDutyCycle(xpertss.ds.jdbc.JdbcPoolingDataSourceTest): Active count is wrong expected:<0> but was:<1>
-  testCreateDateAndLastAccessDate(xpertss.ds.jdbc.JdbcPoolingDataSourceTest): Dates match
-  testMaxLife(xpertss.ds.jdbc.JdbcPoolingDataSourceTest): Active count is wrong expected:<0> but was:<1>
-
- */
 public class JdbcPoolingDataSourceTest {
 
    private NetworkServerControl server;
@@ -121,7 +114,6 @@ public class JdbcPoolingDataSourceTest {
 
 
 
-   // TODO testMaxLife(xpertss.ds.jdbc.JdbcPoolingDataSourceTest): Active count is wrong expected:<0> but was:<1>
    @Test
    public void testMaxLife() throws Exception
    {
@@ -148,7 +140,7 @@ public class JdbcPoolingDataSourceTest {
             if(connOne != null) connOne.close();
          }
 
-         assertEquals("Active count is wrong", 0, ds.getActiveCount());  // Active count is wrong expected:<0> but was:<1>
+         assertEquals("Active count is wrong", 0, ds.getActiveCount());
          assertEquals("Busy count is wrong", 0, ds.getBusyCount());
          assertEquals("Idle count is wrong", 0, ds.getIdleCount());
 
@@ -326,7 +318,6 @@ public class JdbcPoolingDataSourceTest {
    }
 
 
-   // TODO testMaxIdleTimeAndDutyCycle(xpertss.ds.jdbc.JdbcPoolingDataSourceTest): Active count is wrong expected:<0> but was:<1>
 
    @Test
    public void testMaxIdleTimeAndDutyCycle() throws Exception
@@ -354,7 +345,7 @@ public class JdbcPoolingDataSourceTest {
          
          ThreadUtils.sleep(7000);
 
-         assertEquals("Active count is wrong", 0, ds.getActiveCount());    // Active count is wrong expected:<0> but was:<1>
+         assertEquals("Active count is wrong", 0, ds.getActiveCount());
          assertEquals("Busy count is wrong", 0, ds.getBusyCount());
          assertEquals("Idle count is wrong", 0, ds.getIdleCount());
 
@@ -1031,7 +1022,6 @@ public class JdbcPoolingDataSourceTest {
    }
 
 
-   // TODO testCreateDateAndLastAccessDate(xpertss.ds.jdbc.JdbcPoolingDataSourceTest): Dates match
    @Test
    public void testCreateDateAndLastAccessDate() throws Exception
    {
@@ -1039,14 +1029,14 @@ public class JdbcPoolingDataSourceTest {
       JdbcPoolingDataSource ds = new JdbcPoolingDataSource(origin);
       try {
          assertTrue("Dates don't match", ds.getCreateDate().equals(ds.getLastAccessDate()));
-         ThreadUtils.sleep(500); // java system clock only has resolution of 20ms
+         ThreadUtils.sleep(200); // java system clock only has resolution of 20ms
          Connection conn = null;
          try {
             conn = ds.getConnection();
          } finally {
             JdbcUtils.close(conn);
          }
-         assertFalse("Dates match", ds.getCreateDate().equals(ds.getLastAccessDate()));   // Dates match
+         assertFalse("Dates match", ds.getCreateDate().equals(ds.getLastAccessDate()));
          assertTrue("Dates wrong", ds.getCreateDate().before(ds.getLastAccessDate()));
       } finally {
          ds.close();
