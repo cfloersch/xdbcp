@@ -55,7 +55,7 @@ public class PooledAs400 extends AS400 {
    public void resetAllServices()
    {
       if(res != null) {
-         res.close(!super.isConnected());
+         res.close(!isConnected());
          res = null;
       }
    }

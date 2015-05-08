@@ -267,3 +267,16 @@ public final class XpertConnectionProvider implements ConnectionProvider {
 }
 
 ````
+
+Supported Drivers
+=================
+
+* JTOpen As400
+* DB2
+* Derby
+* MySQL
+* Oracle
+* Postgres
+
+Additional drivers may be added using the service provider framework and the
+JdbcDriverService.

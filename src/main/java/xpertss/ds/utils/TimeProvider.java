@@ -40,6 +40,13 @@ public abstract class TimeProvider {
       cache.set(stub);
    }
 
+
+   /**
+    * Clear any stubbed time providers that may be associated with the calling
+    * thread.
+    */
+   public static void clear() { cache.set(null); }
+
    /**
     * Get the default time provider for the calling thread. If a stub has not
     * been defined this will return the system time provider.

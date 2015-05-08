@@ -11,6 +11,7 @@ import xpertss.ds.JdbcDataSource;
 import xpertss.ds.PoolingDataSource;
 import xpertss.ds.utils.JdbcUtils;
 import xpertss.ds.utils.ThreadUtils;
+import xpertss.ds.utils.TimeProvider;
 
 import javax.naming.Reference;
 import javax.naming.StringRefAddr;
@@ -31,6 +32,13 @@ import static junit.framework.Assert.fail;
 import static org.junit.Assert.assertNotNull;
 
 
+/*
+Failed tests:
+  testMaxIdleTimeAndDutyCycle(xpertss.ds.jdbc.JdbcPoolingDataSourceTest): Active count is wrong expected:<0> but was:<1>
+  testCreateDateAndLastAccessDate(xpertss.ds.jdbc.JdbcPoolingDataSourceTest): Dates match
+  testMaxLife(xpertss.ds.jdbc.JdbcPoolingDataSourceTest): Active count is wrong expected:<0> but was:<1>
+
+ */
 public class JdbcPoolingDataSourceTest {
 
    private NetworkServerControl server;
@@ -39,6 +47,8 @@ public class JdbcPoolingDataSourceTest {
    @Before
    public void setUp() throws Exception
    {
+      TimeProvider.clear();
+
       System.setProperty("derby.system.home", "db");
 
       server = new NetworkServerControl(InetAddress.getByName("localhost"),1527, "me", "mine");
@@ -46,6 +56,110 @@ public class JdbcPoolingDataSourceTest {
 
       ThreadUtils.sleep(500);   // give time for db to startup
    }
+
+
+   /**
+    * The JdbcOriginDataSource implements the JNDI Referenceable
+    * interface. Make sure its returned reference is complete.
+    */
+   @Test
+   public void testReference() throws Exception
+   {
+      JdbcOriginDataSource origin = createOriginDataSource(5);
+      origin.setProperty(JdbcDataSource.ISOLATION, "Serializable");
+      origin.setProperty(JdbcDataSource.HOLDABILITY, "Hold");
+      origin.setProperty(JdbcDataSource.READ_ONLY, "true");
+      origin.setProperty(JdbcDataSource.AUTO_COMMIT, "true");
+      origin.setProperty(JdbcDataSource.CONNECT_TIMEOUT, "1000");
+      origin.setProperty(JdbcDataSource.BLACKOUT, "30");
+
+
+      JdbcPoolingDataSource ds = new JdbcPoolingDataSource(origin);
+      ds.setProperty(PoolingDataSource.DUTY_CYCLE, "300");
+      ds.setProperty(PoolingDataSource.MAX_CONNECTIONS, "3");
+      ds.setProperty(PoolingDataSource.MAX_IDLE, "300");
+      ds.setProperty(PoolingDataSource.MAX_IDLE_TIME, "300");
+      ds.setProperty(PoolingDataSource.MAX_LIFE_TIME, "300");
+      ds.setProperty(PoolingDataSource.MAX_WAIT_TIME, "300");
+      ds.setProperty(PoolingDataSource.TEST_SCHEME, "Never");
+
+
+      Reference ref = ds.getReference();
+
+      assertRef(JdbcDataSource.DRIVER, ref, "org.apache.derby.jdbc.ClientDriver");
+      assertRef(JdbcDataSource.URL, ref, "jdbc:derby://localhost:1527/myDB;create=true;user=me;password=mine");
+      assertRef(JdbcDataSource.ISOLATION, ref, "Serializable");
+      assertRef(JdbcDataSource.HOLDABILITY, ref, "Hold");
+      assertRef(JdbcDataSource.READ_ONLY, ref, "true");
+      assertRef(JdbcDataSource.AUTO_COMMIT, ref, "true");
+      assertRef(JdbcDataSource.CONNECT_TIMEOUT, ref, "1000");
+      assertRef(JdbcDataSource.BLACKOUT, ref, "30");
+
+      assertRef(PoolingDataSource.DUTY_CYCLE, ref, "300");
+      assertRef(PoolingDataSource.MAX_CONNECTIONS, ref, "3");
+      assertRef(PoolingDataSource.MAX_IDLE, ref, "300");
+      assertRef(PoolingDataSource.MAX_IDLE_TIME, ref, "300");
+      assertRef(PoolingDataSource.MAX_LIFE_TIME, ref, "300");
+      assertRef(PoolingDataSource.MAX_WAIT_TIME, ref, "300");
+      assertRef(PoolingDataSource.TEST_SCHEME, ref, "Never");
+
+      assertEquals("Reference class name is not correct", JdbcDataSource.class.getName(), ref.getClassName());
+
+      ds.setProperty(PoolingDataSource.DUTY_CYCLE, "500");
+      assertRef(PoolingDataSource.DUTY_CYCLE, ds.getReference(), "500");
+
+      ds.setProperty(PoolingDataSource.TEST_SCHEME, "Borrow");
+      assertRef(PoolingDataSource.TEST_SCHEME, ds.getReference(), "Borrow");
+
+      ds.setProperty(JdbcDataSource.BLACKOUT, "500");
+      assertRef(JdbcDataSource.BLACKOUT, ds.getReference(), "500");
+
+      ds.setProperty(JdbcDataSource.READ_ONLY, "false");
+      assertRef(JdbcDataSource.READ_ONLY, ds.getReference(), "false");
+
+   }
+
+
+
+   // TODO testMaxLife(xpertss.ds.jdbc.JdbcPoolingDataSourceTest): Active count is wrong expected:<0> but was:<1>
+   @Test
+   public void testMaxLife() throws Exception
+   {
+      JdbcOriginDataSource origin = createOriginDataSource(5);
+      JdbcPoolingDataSource ds = new JdbcPoolingDataSource(origin);
+      try {
+         ds.setProperty(PoolingDataSource.MAX_LIFE_TIME, "1");
+
+         Connection connOne = null;
+         try {
+            connOne = ds.getConnection();
+
+            assertEquals("Active count is wrong", 1, ds.getActiveCount());
+            assertEquals("Busy count is wrong", 1, ds.getBusyCount());
+            assertEquals("Idle count is wrong", 0, ds.getIdleCount());
+
+            ThreadUtils.sleep(1500);
+
+            assertEquals("Active count is wrong", 1, ds.getActiveCount());
+            assertEquals("Busy count is wrong", 1, ds.getBusyCount());
+            assertEquals("Idle count is wrong", 0, ds.getIdleCount());
+
+         } finally {
+            if(connOne != null) connOne.close();
+         }
+
+         assertEquals("Active count is wrong", 0, ds.getActiveCount());  // Active count is wrong expected:<0> but was:<1>
+         assertEquals("Busy count is wrong", 0, ds.getBusyCount());
+         assertEquals("Idle count is wrong", 0, ds.getIdleCount());
+
+      } finally {
+         ds.close();
+      }
+
+      assertEquals("Expected the pool to be empty", 0, ds.getActiveCount());
+   }
+
+
 
 
    @Test
@@ -119,8 +233,7 @@ public class JdbcPoolingDataSourceTest {
       try {
          ds.setProperty(PoolingDataSource.MIN_CONNECTIONS, "2");
 
-         assertEquals("Expected different value for property min-connections", "2",
-                        ds.getProperty(PoolingDataSource.MIN_CONNECTIONS));
+         assertEquals("Expected different value for property min-connections", "2", ds.getProperty(PoolingDataSource.MIN_CONNECTIONS));
 
          assertEquals("Expected connections to be prefilled", 2, ds.getActiveCount());
       } finally {
@@ -172,38 +285,6 @@ public class JdbcPoolingDataSourceTest {
       assertEquals("Expected the pool to be empty", 0, ds.getActiveCount());
    }
 
-   @Test
-   public void testMaxLife() throws Exception
-   {
-      JdbcOriginDataSource origin = createOriginDataSource(5);
-      JdbcPoolingDataSource ds = new JdbcPoolingDataSource(origin);
-      try {
-         ds.setProperty(PoolingDataSource.MAX_LIFE_TIME, "1");
-         
-         Connection connOne = null;
-         try {
-            connOne = ds.getConnection();
-
-            assertEquals("Active count is wrong", 1, ds.getActiveCount());
-            assertEquals("Busy count is wrong", 1, ds.getBusyCount());
-            assertEquals("Idle count is wrong", 0, ds.getIdleCount());
-            
-            ThreadUtils.sleep(1500);
-            
-         } finally {
-            if(connOne != null) connOne.close();
-         }
-
-         assertEquals("Active count is wrong", 0, ds.getActiveCount());
-         assertEquals("Busy count is wrong", 0, ds.getBusyCount());
-         assertEquals("Idle count is wrong", 0, ds.getIdleCount());
-
-      } finally {
-         ds.close();
-      }
-      
-      assertEquals("Expected the pool to be empty", 0, ds.getActiveCount());
-   }
 
 
    @Test
@@ -214,8 +295,7 @@ public class JdbcPoolingDataSourceTest {
       try {
          ds.setProperty(PoolingDataSource.MAX_IDLE, "1");
          
-         assertEquals("Expected different value for property max-idle", "1", 
-               ds.getProperty(PoolingDataSource.MAX_IDLE));
+         assertEquals("Expected different value for property max-idle", "1", ds.getProperty(PoolingDataSource.MAX_IDLE));
    
          Connection connOne = null;
          Connection connTwo = null;
@@ -246,6 +326,8 @@ public class JdbcPoolingDataSourceTest {
    }
 
 
+   // TODO testMaxIdleTimeAndDutyCycle(xpertss.ds.jdbc.JdbcPoolingDataSourceTest): Active count is wrong expected:<0> but was:<1>
+
    @Test
    public void testMaxIdleTimeAndDutyCycle() throws Exception
    {
@@ -272,7 +354,7 @@ public class JdbcPoolingDataSourceTest {
          
          ThreadUtils.sleep(7000);
 
-         assertEquals("Active count is wrong", 0, ds.getActiveCount());
+         assertEquals("Active count is wrong", 0, ds.getActiveCount());    // Active count is wrong expected:<0> but was:<1>
          assertEquals("Busy count is wrong", 0, ds.getBusyCount());
          assertEquals("Idle count is wrong", 0, ds.getIdleCount());
 
@@ -948,6 +1030,8 @@ public class JdbcPoolingDataSourceTest {
       }
    }
 
+
+   // TODO testCreateDateAndLastAccessDate(xpertss.ds.jdbc.JdbcPoolingDataSourceTest): Dates match
    @Test
    public void testCreateDateAndLastAccessDate() throws Exception
    {
@@ -955,14 +1039,14 @@ public class JdbcPoolingDataSourceTest {
       JdbcPoolingDataSource ds = new JdbcPoolingDataSource(origin);
       try {
          assertTrue("Dates don't match", ds.getCreateDate().equals(ds.getLastAccessDate()));
-         ThreadUtils.sleep(100); // java system clock only has resolution of 20ms
+         ThreadUtils.sleep(500); // java system clock only has resolution of 20ms
          Connection conn = null;
          try {
             conn = ds.getConnection();
          } finally {
             JdbcUtils.close(conn);
          }
-         assertFalse("Dates match", ds.getCreateDate().equals(ds.getLastAccessDate()));
+         assertFalse("Dates match", ds.getCreateDate().equals(ds.getLastAccessDate()));   // Dates match
          assertTrue("Dates wrong", ds.getCreateDate().before(ds.getLastAccessDate()));
       } finally {
          ds.close();
@@ -975,66 +1059,6 @@ public class JdbcPoolingDataSourceTest {
 
 
 
-   /**
-    * The JdbcOriginDataSource implements the JNDI Referenceable
-    * interface. Make sure its returned reference is complete.
-    */
-   @Test
-   public void testReference() throws Exception
-   {
-      JdbcOriginDataSource origin = createOriginDataSource(5);
-      origin.setProperty(JdbcDataSource.ISOLATION, "Serializable");
-      origin.setProperty(JdbcDataSource.HOLDABILITY, "Hold");
-      origin.setProperty(JdbcDataSource.READ_ONLY, "true");
-      origin.setProperty(JdbcDataSource.AUTO_COMMIT, "true");
-      origin.setProperty(JdbcDataSource.CONNECT_TIMEOUT, "1000");
-      origin.setProperty(JdbcDataSource.BLACKOUT, "30");
-
-
-      JdbcPoolingDataSource ds = new JdbcPoolingDataSource(origin);
-      ds.setProperty(PoolingDataSource.DUTY_CYCLE, "300");
-      ds.setProperty(PoolingDataSource.MAX_CONNECTIONS, "3");
-      ds.setProperty(PoolingDataSource.MAX_IDLE, "300");
-      ds.setProperty(PoolingDataSource.MAX_IDLE_TIME, "300");
-      ds.setProperty(PoolingDataSource.MAX_LIFE_TIME, "300");
-      ds.setProperty(PoolingDataSource.MAX_WAIT_TIME, "300");
-      ds.setProperty(PoolingDataSource.TEST_SCHEME, "Never");
-
-
-      Reference ref = ds.getReference();
-
-      assertRef(JdbcDataSource.DRIVER, ref, "org.apache.derby.jdbc.ClientDriver");
-      assertRef(JdbcDataSource.URL, ref, "jdbc:derby://localhost:1527/myDB;create=true;user=me;password=mine");
-      assertRef(JdbcDataSource.ISOLATION, ref, "Serializable");
-      assertRef(JdbcDataSource.HOLDABILITY, ref, "Hold");
-      assertRef(JdbcDataSource.READ_ONLY, ref, "true");
-      assertRef(JdbcDataSource.AUTO_COMMIT, ref, "true");
-      assertRef(JdbcDataSource.CONNECT_TIMEOUT, ref, "1000");
-      assertRef(JdbcDataSource.BLACKOUT, ref, "30");
-
-      assertRef(PoolingDataSource.DUTY_CYCLE, ref, "300");
-      assertRef(PoolingDataSource.MAX_CONNECTIONS, ref, "3");
-      assertRef(PoolingDataSource.MAX_IDLE, ref, "300");
-      assertRef(PoolingDataSource.MAX_IDLE_TIME, ref, "300");
-      assertRef(PoolingDataSource.MAX_LIFE_TIME, ref, "300");
-      assertRef(PoolingDataSource.MAX_WAIT_TIME, ref, "300");
-      assertRef(PoolingDataSource.TEST_SCHEME, ref, "Never");
-
-      assertEquals("Reference class name is not correct", JdbcDataSource.class.getName(), ref.getClassName());
-
-      ds.setProperty(PoolingDataSource.DUTY_CYCLE, "500");
-      assertRef(PoolingDataSource.DUTY_CYCLE, ds.getReference(), "500");
-
-      ds.setProperty(PoolingDataSource.TEST_SCHEME, "Borrow");
-      assertRef(PoolingDataSource.TEST_SCHEME, ds.getReference(), "Borrow");
-
-      ds.setProperty(JdbcDataSource.BLACKOUT, "500");
-      assertRef(JdbcDataSource.BLACKOUT, ds.getReference(), "500");
-
-      ds.setProperty(JdbcDataSource.READ_ONLY, "false");
-      assertRef(JdbcDataSource.READ_ONLY, ds.getReference(), "false");
-
-   }
 
 
    private void assertRef(String field, Reference ref, String value) throws Exception

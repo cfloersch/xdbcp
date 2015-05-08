@@ -47,6 +47,8 @@ public class JdbcOriginDataSourceTest {
    @Before
    public void setUp() throws Exception
    {
+      TimeProvider.clear();
+
       mockDriver = mock(Driver.class);
       mockConn = mock(Connection.class);
       when(mockDriver.connect(anyString(), any(Properties.class))).thenReturn(mockConn);
@@ -1041,7 +1043,7 @@ public class JdbcOriginDataSourceTest {
       
 
       assertFalse(ds.isAvailable());
-      ThreadUtils.sleep(500);  // sleep for 2 seconds
+      ThreadUtils.sleep(600);  // sleep for 2 seconds
       try {
          conn = ds.getConnection();
          fail("Datasource should be unavailable");
@@ -1050,7 +1052,7 @@ public class JdbcOriginDataSourceTest {
       } finally {
          JdbcUtils.close(conn);
       }
-      ThreadUtils.sleep(510);  // sleep for 2 seconds
+      ThreadUtils.sleep(600);  // sleep for 2 seconds
       assertTrue(ds.isAvailable());
 
    }
