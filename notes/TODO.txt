@@ -1,6 +1,3 @@
-Convert most of the AS400 pool tests to mocked connections
-
-
 Solve concurrency issue in JdbcPoolingDataSource.markUnavailable()
 
 
