@@ -26,9 +26,11 @@ public class BaseDataSourceFactory {
       this.type = Objects.notNull(type);
    }
 
-   protected void bindJmx(Object o, Name name, Hashtable<?, ?> env)
+   protected void bindJmx(Object o, Name name, Reference ref, Hashtable<?, ?> env)
    {
       Object prefix = env.get(ObjectName.class.getName());
+      if(prefix == null) prefix = getContent(ref, "jmx-prefix");
+      if(prefix == null) prefix = System.getProperty(ObjectName.class.getName());
       if(prefix != null) {
          try {
             ObjectName objName = new ObjectName(prefix.toString() + 

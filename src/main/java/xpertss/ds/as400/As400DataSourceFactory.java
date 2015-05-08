@@ -96,7 +96,7 @@ public class As400DataSourceFactory extends BaseDataSourceFactory implements Obj
             }
 
 
-            bindJmx(source, name, env);
+            bindJmx(source, name, ref, env);
             return source;
          }
       }

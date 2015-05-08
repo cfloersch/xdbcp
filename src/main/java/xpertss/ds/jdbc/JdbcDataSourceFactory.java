@@ -3,6 +3,7 @@ package xpertss.ds.jdbc;
 import java.util.Hashtable;
 import java.util.Set;
 
+import javax.management.ObjectName;
 import javax.naming.Context;
 import javax.naming.Name;
 import javax.naming.Reference;
@@ -80,6 +81,7 @@ public class JdbcDataSourceFactory extends BaseDataSourceFactory implements Obje
    {
       if(obj instanceof Reference) {
          Reference ref = (Reference) obj;
+
          String className = ref.getClassName();
          if(supported.contains(className)) {
 
@@ -98,8 +100,8 @@ public class JdbcDataSourceFactory extends BaseDataSourceFactory implements Obje
                   source.setProperty(key, value);
                }
             }
-            
-            bindJmx(source, name, env);
+
+            bindJmx(source, name, ref, env);
 
             if("javax.sql.DataSource".equals(className)) {
                return new SqlDataSource(source, getContent(ref, JdbcDataSource.USERNAME));

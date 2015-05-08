@@ -104,7 +104,7 @@ public class JdbcDynaSourceFactory extends BaseDataSourceFactory implements Obje
                }
             }
 
-            bindJmx(source, name, env);
+            bindJmx(source, name, ref, env);
 
             if("javax.sql.DataSource".equals(className)) {
                return new SqlDataSource(source, getContent(ref, JdbcDataSource.USERNAME));
