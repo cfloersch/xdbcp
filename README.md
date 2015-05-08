@@ -142,7 +142,8 @@ Use with Tomcat JNDI
            read-timeout="20"
            max-idle="2"
            max-life-time="72"
-           max-idle-time="300"/>
+           max-idle-time="300"
+           jmx-prefix="Simulcast:type=Pools"/>
 ````
 
 In the above example the xpertss.ds.JdbcDataSource will be wrapped in a javax.sql.DataSource wrapper to
@@ -162,7 +163,8 @@ directly you can use the following instead:
            read-timeout="20"
            max-idle="2"
            max-life-time="72"
-           max-idle-time="300"/>
+           max-idle-time="300"
+           jmx-prefix="Simulcast:type=Pools"/>
 ````
 
 With the above context you could also define an AS400 pool
@@ -179,7 +181,8 @@ With the above context you could also define an AS400 pool
            read-timeout="20"
            max-idle="2"
            max-life-time="72"
-           max-idle-time="300"/>
+           max-idle-time="300"
+           jmx-prefix="Simulcast:type=Pools"/>
 ````
 
 You will notice that the AS400 connection pool properties are the same as those for the JDBC pool.
