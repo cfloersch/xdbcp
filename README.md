@@ -16,7 +16,7 @@ a connection. This can be useful to minimize the load on a database that is bein
 is being restored.
 
 Additionally, the pools can expose their properties via JMX. Whether we are talking about configuration
-properties or properties exposed via JMX pools are identical regardless of the type of connection they
+properties or properties exposed via JMX, pools are identical regardless of the type of connection they
 maintain.
 
 The origin data source provides the ability to set both connection time outs and read time outs on all
