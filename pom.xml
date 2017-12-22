@@ -90,7 +90,7 @@
       <dependency>
          <groupId>net.sf.jt400</groupId>
          <artifactId>jt400</artifactId>
-         <version>7.9</version>
+         <version>8.5</version>
          <scope>provided</scope>
       </dependency>
       <dependency>
