@@ -4,7 +4,7 @@
 
    <groupId>org.xpertss</groupId>
    <artifactId>xdbcp</artifactId>
-   <version>2.4</version>
+   <version>2.5-SNAPSHOT</version>
 
    <name>${project.groupId}:${project.artifactId}</name>
    <description>A modern high speed connection pool that supports multiple connection types.</description>
@@ -173,7 +173,7 @@
       <url>https://github.com/cfloersch/xdbcp</url>
       <connection>scm:git:git://git@github.com/cfloersch/xdbcp.git</connection>
       <developerConnection>scm:git:git@github.com:cfloersch/xdbcp.git</developerConnection>
-      <tag>xdbcp-2.4</tag>
+      <tag>HEAD</tag>
    </scm>
 
    <profiles>
