@@ -137,7 +137,7 @@ Use with Tomcat JNDI
            username="username"
            password="password"
            driver="com.mysql.jdbc.Driver"
-           url="jdbc:mysql://db.simulcast.manheim/SIMULCAST?useGmtMillisForDatetimes=true"
+           url="jdbc:mysql://db.simulcast.manheim/SIMULCAST?useLegacyDatetimeCode=false"
            connect-timeout="5"
            read-timeout="20"
            max-idle="2"
@@ -158,7 +158,7 @@ directly you can use the following instead:
            username="username"
            password="password"
            driver="com.mysql.jdbc.Driver"
-           url="jdbc:mysql://db.simulcast.manheim/SIMULCAST?useGmtMillisForDatetimes=true"
+           url="jdbc:mysql://db.simulcast.manheim/SIMULCAST?useLegacyDatetimeCode=false"
            connect-timeout="5"
            read-timeout="20"
            max-idle="2"
@@ -200,7 +200,7 @@ The following was pulled from an ActiveMQ setup config
     <constructor-arg index="0">
        <props>
           <prop key="driver">com.mysql.jdbc.Driver</prop>
-          <prop key="url">jdbc:mysql://db.bidnow.manheim.com/bidnow?useJDBCCompliantTimezoneShift=true</prop>
+          <prop key="url">jdbc:mysql://db.bidnow.manheim.com/bidnow?useLegacyDatetimeCode=false</prop>
           <prop key="username">${mysql.username}</prop>
           <prop key="password">${mysql.password}</prop>
           <prop key="connect-timeout">3</prop>
