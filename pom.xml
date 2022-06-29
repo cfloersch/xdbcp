@@ -4,7 +4,7 @@
 
    <groupId>org.xpertss</groupId>
    <artifactId>xdbcp</artifactId>
-   <version>2.5-SNAPSHOT</version>
+   <version>2.6-SNAPSHOT</version>
 
    <name>${project.groupId}:${project.artifactId}</name>
    <description>A modern high speed connection pool that supports multiple connection types.</description>
@@ -118,7 +118,7 @@
       <dependency>
          <groupId>mysql</groupId>
          <artifactId>mysql-connector-java</artifactId>
-         <version>5.1.10</version>
+         <version>8.0.29</version>
          <scope>provided</scope>
       </dependency>
       <dependency>

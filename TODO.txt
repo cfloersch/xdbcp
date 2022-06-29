@@ -1,0 +1,1 @@
+Add a Purge operation to pool to force flush all connections
