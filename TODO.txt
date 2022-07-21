@@ -1,1 +1,18 @@
 Add a Purge operation to pool to force flush all connections
+
+Migrate to Java 8+
+  Oracle Driver JDBC8
+      <groupId>com.oracle.ojdbc</groupId>
+      <artifactId>ojdbc8</artifactId>
+      <version>19.3.0.0</version>
+  Postgresql
+      <groupId>org.postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+      <version>42.4.0</version>
+  Derby
+      <groupId>org.apache.derby</groupId>
+      <artifactId>derbyclient</artifactId>
+      <version>10.14.2.0</version>
+
+Java 8 - JDBC 4.2
+Java 9 - JDBC 4.3 (Adds beginRequest/endRequest for pools to inform connections they are being drawn from the pool and returned respectively)
